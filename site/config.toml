@@ -15,13 +15,7 @@ home = [ "HTML", "RSS", "JSON" ]
   url = '/archive/'
   weight = -110
 
-[[menu.main]]
-  identifier = 'Tools'
-  name = 'Tools'
-  pre = "<i class='fa fa-heart'></i>"
-  url = '/tools/'
-  weight = -105
-  
+
 [[menu.main]]
   identifier = 'Search'
   name = 'Search'
@@ -31,7 +25,6 @@ home = [ "HTML", "RSS", "JSON" ]
 
 [params.homeInfoParams]
 Title = "人生 波澜壮阔"
-# Content = "今朝有酒今朝醉, 明日愁来明日愁 | Have fun"
 
 [params]   
 gtm = "GTM-WXVJN82"
