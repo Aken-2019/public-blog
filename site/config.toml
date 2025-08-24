@@ -1,0 +1,37 @@
+baseURL = '/'
+languageCode = 'en-us'
+title = 'Harry! Learn!'
+theme = "hugo-PaperMod"
+
+[outputs]
+home = [ "HTML", "RSS", "JSON" ]
+
+
+[menu]
+[[menu.main]]
+  identifier = 'Archive'
+  name = 'Archive'
+  pre = "<i class='fa fa-heart'></i>"
+  url = '/archive/'
+  weight = -110
+
+[[menu.main]]
+  identifier = 'Tools'
+  name = 'Tools'
+  pre = "<i class='fa fa-heart'></i>"
+  url = '/tools/'
+  weight = -105
+  
+[[menu.main]]
+  identifier = 'Search'
+  name = 'Search'
+  pre = "<i class='fa fa-heart'></i>"
+  url = '/Search/'
+  weight = -100
+
+[params.homeInfoParams]
+Title = "人生 波澜壮阔"
+# Content = "今朝有酒今朝醉, 明日愁来明日愁 | Have fun"
+
+[params]   
+gtm = "GTM-WXVJN82"
