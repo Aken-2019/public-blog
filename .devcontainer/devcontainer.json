@@ -1,0 +1,8 @@
+{
+
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/hugo:1": {}
+  },
+  "updateContentCommand": "git submodule update --init --recursive"
+}
