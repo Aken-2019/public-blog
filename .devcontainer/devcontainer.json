@@ -1,6 +1,4 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {
-    "ghcr.io/devcontainers/features/hugo:1": {}
-  }
+  "image": "mcr.microsoft.com/devcontainers/hugo:0.148",
+  "postCreateCommand": "git submodule update --init --recursive"
 }
