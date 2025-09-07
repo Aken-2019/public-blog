@@ -1,59 +1,111 @@
 ---
-title: "N8N - Telegram Bot for ZH-DE Translation With Anki"
+title: "n8n - Telegram Bot for ZH-DE Translation With Anki"
 date: 2025-08-24T14:22:07+08:00
 draft: false
+showtoc: true
 ---
 
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+### Accounts & API Keys
+- A [Telegram](https://telegram.org/) account
+- A Telegram Bot Token from [@BotFather](https://t.me/botfather)
+- An OpenAI API key or compatible LLM service API key
+- An [AnkiWeb](https://ankiweb.net/) account (for syncing)
+
+### Required Software
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed
+- A server with at least 2GB of RAM (1GB for n8n + 1GB for Anki)
+- [Coolify](https://coolify.io/) installed (or another Docker management solution)
+
+
 ## Background
-I'm coming to Germany in a few days to seek for a job. I want to have a tool to help me speak German better. I tried lots of dictionary apps, but no one meet my needs. An ideal app should accept Chinese voice input and translate it to German, and then store the translation in Anki. In that way, I can efficiently memorize the translation and practice speaking German. Therefore, I decided to build one by myself. 
+I'm moving to Germany soon to look for a job and wanted a tool to help me improve my German speaking skills. After trying numerous dictionary apps without finding one that met my needs, I decided to build my own solution. My ideal application would accept **Chinese voice input** or **text input**, translate it to German, and store the translations in **Anki**. This workflow would allow me to efficiently memorize vocabulary and practice speaking German. 
 
-## Workflow
-The workflow shown as below, which is too long to fit the screen properly. 
+## Reference
+While setting up this workflow, I referred to the following video:
+- [How to Build a Voice AND Text AI Agent in n8n with No Code](https://www.youtube.com/watch?v=1gmE_ExDvsE)
 
-The nodes are grouped into 4 parts:
-1. Input: Get voice from Telegram,
-2. Processing: Transcribe audio to text, translate text to German, generate explanation in Chinese,
-3. Output: Send messages to Telegram, and
-4. Storage: Save to Anki.
+I highly recommend watching this excellent tutorial. In this blog post, I'll focus on the differences and customizations I implemented in my workflow compared to the video.
 
 
+## Workflow Overview
+The workflow consists of four main components:
+1. **Input Audio and Text Processing**: 
+  1. Capture voice or text messages from Telegram.
+  2. Transcribe audio to text.
+2. **Agent Setup**:
+   1. Translate text from Chinese to German.
+   2. Generate explanations in Chinese.
+   3. Convert German text to speech.
+3. **Output**: Send responses back through Telegram.
+4. **Storage**: Save translations to Anki for review.
 
+The workflow configuration file can be downloaded via this link [AnkiAssistant.json](/20250824-n8n-telegram-bot/AnkiAssistant.json) and imported to your own n8n instance.  Screenshots of each part of the workflow are provided below:
 
-0. Reference
-I was refering to this video when setting up this workflow. I highly recommend you to check this video before starting. This post will skip the basics and focus on the hard and different part of this specific needs.
+- Part 1: Input Audio and Text Processing
+![Part 1](/20250824-n8n-telegram-bot/workflow_p1.png)
+
+- Part 2: Agent Setup and Part 3: Telegram Reply Implementation
+![Part 2](/20250824-n8n-telegram-bot/workflow_p2p3.png)
+
+- Part 4: Anki Integration Implementation
+![Part 4](/20250824-n8n-telegram-bot/workflow_p4.png)
+
 
 ## Infrastructure
-I selfhost all the services in Coolify, including
-1. n8n community version,
-2. Anki's desktop application in docker,
-3. and Traefik as the reverse proxy service (which is part of the Coolify service).
+All services are self-hosted using Coolify, including:
+
+1. n8n (community edition)
+2. Anki desktop application running in Docker
+3. Traefik as the reverse proxy (included with Coolify)
+
+
+#### System Requirements
+Running an Anki docker service is resource-intensive. Based on my `docker stats` monitoring, the Anki service typically uses around 517MB of memory. For stable operation, I recommend having at least 756MB of free memory available.
+
+```
+CONTAINER ID   NAME                                    CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS 
+11e345a80f64   anki-desktop-e4k004csggkkwwo48oo4g8ow   0.48%     517.6MiB / 3.823GiB   13.22%    1.96MB / 1.15MB   196MB / 7.76MB    113 
+```
 
 
 
-## Detail Implementations
-### Replace If Node with Switch Node
-The nodes before the Agent Node is almost identical, except that I'm using a Switch Node instead of an If Node because the If Node does't pass the value to next step correctly with the following message:
+## Part 1: Input Implementation
+
+
+
+### Replacing "If Node" with "Switch Node"
+
+The initial part of my workflow closely follows the reference video, with one key modification: I've replaced the "If Node" with a "Switch Node". This change was necessary because the "If Node" wasn't correctly passing values to subsequent nodes at the time of implementation, resulting in the following error:
+
 ```
 No fields - node executed, but no items were sent on this branch
 ```
 
-The same issue sames happening to others as well, according to this post: https://community.n8n.io/t/switch-problem-no-fields-node-executed-but-no-items-were-sent-on-this-branch/134137
+I'm not alone in encountering this issue, as discussed in this [n8n community post](https://community.n8n.io/t/switch-problem-no-fields-node-executed-but-no-items-were-sent-on-this-branch/134137). While the "Switch Node" implementation is slightly more complex, it provides reliable value passing between nodes.
 
-As suggested by its comments, I use a Switch Node to replace the If Node.
 
-### Add a FFMPEG Node between Get-File Node and Transcribing-Audio Node
-I have an issue when using OpenAI-compatible service. If you are using OpenAI's official service, you can skip this part. Below are the details about the problem and solutuon.
+### Adding an FFMPEG Node for Audio Conversion
 
-Telegram uses OGG or OGA to encode audio recordings sent by user. These formats are supported by OpenAI but may not be supported by third-party providers.
+When using OpenAI-compatible services, I encountered file format compatibility issues. If you're using OpenAI's official service, you can skip this section.
 
-According to [this post](https://community.n8n.io/t/open-ai-transcribe-a-recording-telegram/149591), the file format error may rise if you don't have enough credits. However, this is not the case for me. I identified that its my service provider's issue by testing its endpoints in Postman with mp3 and ogg formats. The result is that mp3 works but not ogg. Therefore, I have to add a ffmpeg node to covert ogg to mp3. Below are the steps:
-1. Build  n8n image with FFMPEG installed,
-2. add the FFMPEG node to your n8n instance,
-3. and configure the n8n node.
+#### The Problem
+Telegram encodes voice messages in OGG or OGA formats. While OpenAI's API supports these formats, some third-party providers don't. This incompatibility was causing API call failures in my workflow.
 
-#### Build image
-I prefer to build the image on-the-go and use `dockerfile_inline` inside a docker-compose file which keeps my code clean and simple. The following content is the docker-compose file I'm using on Coolify.
-```
+#### The Solution
+I resolved this by adding an FFMPEG node to convert OGG files to MP3 format. Here's how to implement this solution:
+
+1. Build a custom n8n Docker image with FFMPEG installed
+2. Add and configure an FFMPEG node in your n8n workflow
+
+#### Building n8n with FFMPEG Support
+
+I prefer using an inline Dockerfile within my docker-compose configuration for simplicity and maintainability. Here's the docker-compose configuration I use with Coolify:
+
+```yaml
 services:
   n8n:
     build:
@@ -63,7 +115,6 @@ services:
         USER root
         RUN apk add --update ffmpeg
         USER node
-    # image: docker.n8n.io/n8nio/n8n
     environment:
       - SERVICE_FQDN_N8N_5678
       - 'N8N_EDITOR_BASE_URL=${SERVICE_FQDN_N8N}'
@@ -80,55 +131,74 @@ services:
       interval: 5s
       timeout: 20s
       retries: 10
-
 ```
 
-#### Add ffmpeg node
-After building the image, you need to add the FFMPEG node to your n8n instance. You can find it in the marketplace. I'm using [n8n-nodes-ffmpeg](https://www.npmjs.com/package/n8n-nodes-ffmpeg) with its `Custom Command` operation. The command defined in this node is 
-```
--i "{input}" -vf "transpose=1" "{output}"
-```
-where `transpose=1` is used to convert the audio to mono.
+This configuration creates a custom n8n image with FFMPEG installed, which is essential for audio format conversion.
 
+#### Configuring the FFMPEG Node in n8n
+
+After setting up the custom n8n image with FFMPEG, you'll need to add the FFMPEG node to your workflow:
+
+1. Install the [n8n-nodes-ffmpeg](https://www.npmjs.com/package/n8n-nodes-ffmpeg) package from the n8n marketplace
+2. Add the FFMPEG node to your workflow
+3. Configure it with the following custom command:
+   ```
+   -i "{input}" -vf "transpose=1" "{output}"
+   ```
+   
+   The `transpose=1` parameter converts the audio to mono, which is often better suited for voice processing.
+
+## Part 2: Audio and Text Processing Implementation
 
 ### Agent Setup
 
-I have used XML format in prompts to generate structured format to me, and it works fantastically. So I use the same trick here. You can find my prompt in this link. It was completed in two steps:
-1. At first, I just use nature language to init a prompt, and testing it in ChatGPT.
-2. Then, I ask ChatGPT to help me format it to XML format. After serveral iterations, it becomes ideal with greate enhancements from ChatGPT's suggestions.
+For the Agent Node configuration, I've implemented a structured XML format for prompts, which has proven highly effective. Here's how I developed the prompt:
 
+1. **Initial Draft**: I started with natural language prompts and tested them in ChatGPT
+2. **Refinement**: I then asked ChatGPT to help convert these into a well-structured XML format
+3. **Iteration**: After several refinement cycles, the prompt evolved with valuable suggestions from ChatGPT
 
-Next to the Agent Node, I add a XML Node because n8n uses JSON as the standard data format. 
+Since n8n primarily uses JSON for data handling, I added an XML Node after the Agent Node to ensure proper data format conversion and processing. 
 
-### Telegram Setup for Sending Messages
-Nodes after the Agent Node are built application-specific functions. In my case:
-    1. Telegram needs to send German translations and Chinese explainations to user.
-    2. In addition, Telegram also need to send a audio file of the German translation, generated by a TTS service.
-    3. Once the messages are sent, they should also be saved to Anki via API.
+## Part 3: Telegram Reply Implementation
+### Setting Up Message Responses
 
-The first two steps are straight forward:
-1. Translation and Explaination are sent in two messages one by one, for better visibility.
-2. A "Recording" status is sent before starting TTS service to hint user that they will also receive a audio version of the translation. 
+The workflow following the Agent Node handles application-specific functionality. In my implementation, this includes:
 
-The last step involves Anki setup in Coolify. I prefer to put it in an independent section as it's not an n8n guide, but rather an infrascture setup.
+1. **Message Delivery**:
+   - Sending German translations and Chinese explanations to the user
+   - Delivering an audio version of the German translation using TTS
+   
+2. **User Experience Flow**:
+   - Translations and explanations are sent as separate messages for better readability
+   - A "Recording" status message is sent before TTS processing begins, setting user expectations
 
-### Anki API Setup
-To have running Anki API service, you need to do the two steps:
-1. Install and run the Anki desktop version in docker. Anki's GUI client can be accessed via VNC.
-2. Install the Anki-connect plugin which provide API endpoints to manipulations to data and GUI of the desktop client.
-3. Protect the Anki services with basic auth.
+3. **Data Persistence**:
+   - All translations are saved to Anki via its API for future review
 
-#### Hardware Requirement
-Running a desktop environment docker requires a lot resource. From `docker stats`, I can see my service uses 517MB memory. To be on the safe side, you should have at least 756 free memory. 
-```
-CONTAINER ID   NAME                                    CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS 
-11e345a80f64   anki-desktop-e4k004csggkkwwo48oo4g8ow   0.48%     517.6MiB / 3.823GiB   13.22%    1.96MB / 1.15MB   196MB / 7.76MB    113 
-```
+Note: The Anki setup details are covered in the following section, as they involve infrastructure configuration rather than n8n workflow setup.
 
-#### Anki in Docker
-I'm using the following docker-compose file to run the Anki service. Because I'm running in on Coolify, the label configurations for Traefik is significantly simplified. Basic auth is added via the `labels` section. You only need to define it and coolify will automatically add it to the middlewares of the service. 
+## Part 4: Anki Integration Implementation
+### Overview of Setting Up Anki with API Access
 
-```
+To integrate Anki with your workflow, follow these steps:
+
+1. **Dockerized Anki Desktop**:
+   - Run the Anki desktop application in a Docker container
+   - Access the GUI client through VNC
+
+2. **Anki-connect Plugin**:
+   - Install the Anki-connect plugin to enable API access
+   - This provides endpoints for programmatic interaction with Anki's data and interface
+
+3. **Security**:
+   - Implement basic authentication to secure your Anki services
+
+#### Docker Configuration for Anki
+
+Here's the docker-compose configuration I use to run Anki in Coolify. The Traefik labels are simplified thanks to Coolify's built-in functionality. Basic authentication is configured through the `labels` section, which Coolify automatically processes and applies to the service's middlewares.
+
+```yaml
 services:
   anki-desktop:
     image: 'mlcivilengineer/anki-desktop-docker:main'
@@ -138,26 +208,45 @@ services:
     volumes:
       - './anki_data:/config'
     expose:
-      - '3000'
-      - '8765'
+      - '3000'  # VNC port
+      - '8765'  # Anki-connect port
     labels:
-      # === add basic auth
+      # Basic authentication configuration
       - 'traefik.http.middlewares.anki.basicauth.users=${AUTH_USER}:${HT_AUTH_PWD}'
-      # === done add basic auth
 ```
 
-If you are not using Coolify, you may find an reference docker-compose here: Pending sumplementry file
+> **Note**: If you're not using Coolify, you'll need to manually configure Traefik or your reverse proxy.
 
+#### Port Configuration
 
-In this doker, there are two ports: `3000` for VNC and `8765` for Anki-connect. To configure two DNS records for the ports in Coolify, you should map the ports and donmains in Coolify like that:
+1. **Port 3000**: VNC access to the Anki desktop interface
+2. **Port 8765**: Anki-connect API endpoint
+
+In Coolify, map these to your domains like this:
 ```
 https://anki.harrylearns.com:3000,https://api-anki.harrylearns.com:8765
-```  
-![anki-fqdn-setup](/20250824-n8n-telegram-bot/image.png)
-Coolify will parse this configuration and forward traffic of `https://anki.harrylearns.com` to the `3000` port of this container.
+```
 
-To finish your setup Anki, you need to 
-1. install Anki-connect plugin,
-2. login to Anki Web account so you can use Anki Web's sync function,
-3. and restart your container to make Anki-connect working.
+![Anki FQDN Setup](/20250824-n8n-telegram-bot/fqdn.png)
 
+Coolify will automatically route traffic to the appropriate ports based on the domain names.
+
+#### Final Setup Steps
+
+To complete your Anki setup:
+
+1. **Install Anki-connect**:
+   - Open the Anki desktop interface via VNC
+   - Install the Anki-connect plugin through Anki's add-on manager
+
+2. **Sync with AnkiWeb**:
+   - Log in to your AnkiWeb account within the desktop client
+   - This enables synchronization of your cards across devices
+
+3. **Restart the Container**:
+   - After installing Anki-connect, restart the container to ensure all components are properly initialized
+   - The Anki-connect service will start automatically with the container
+
+
+## Summary
+In this blog post, I've outlined the process of building a Telegram bot using n8n that can translate Chinese to German and store the translations in Anki. The workflow is designed to be simple and easy to use, with clear instructions for each step. I hope this blog post will be helpful to others who are looking to build similar applications.
