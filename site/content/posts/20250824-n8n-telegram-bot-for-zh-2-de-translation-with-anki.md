@@ -5,22 +5,6 @@ draft: false
 showtoc: true
 ---
 
-## Prerequisites
-
-Before you begin, make sure you have the following:
-
-### Accounts & API Keys
-- A [Telegram](https://telegram.org/) account
-- A Telegram Bot Token from [@BotFather](https://t.me/botfather)
-- An OpenAI API key or compatible LLM service API key
-- An [AnkiWeb](https://ankiweb.net/) account (for syncing)
-
-### Required Software
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed
-- A server with at least 2GB of RAM (1GB for n8n + 1GB for Anki)
-- [Coolify](https://coolify.io/) installed (or another Docker management solution)
-
-
 ## Background
 I'm moving to Germany soon to look for a job and wanted a tool to help me improve my German speaking skills. After trying numerous dictionary apps without finding one that met my needs, I decided to build my own solution. My ideal application would accept **Chinese voice input** or **text input**, translate it to German, and store the translations in **Anki**. This workflow would allow me to efficiently memorize vocabulary and practice speaking German. 
 
@@ -70,6 +54,22 @@ Running an Anki docker service is resource-intensive. Based on my `docker stats`
 CONTAINER ID   NAME                                    CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS 
 11e345a80f64   anki-desktop-e4k004csggkkwwo48oo4g8ow   0.48%     517.6MiB / 3.823GiB   13.22%    1.96MB / 1.15MB   196MB / 7.76MB    113 
 ```
+
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+### Accounts & API Keys
+- A [Telegram](https://telegram.org/) account
+- A Telegram Bot Token from [@BotFather](https://t.me/botfather)
+- An OpenAI API key or compatible LLM service API key
+- An [AnkiWeb](https://ankiweb.net/) account (for syncing)
+
+### Required Software
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed
+- A server with at least 2GB of RAM (1GB for n8n + 1GB for Anki)
+- [Coolify](https://coolify.io/) installed (or another Docker management solution)
 
 
 
