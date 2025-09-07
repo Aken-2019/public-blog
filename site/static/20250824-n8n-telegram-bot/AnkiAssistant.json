@@ -1,0 +1,815 @@
+{
+  "name": "AnkiAssistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -704,
+        48
+      ],
+      "id": "fe1f8550-ea0a-4169-bf4e-9da19807bf41",
+      "name": "Telegram Trigger",
+      "webhookId": "f70c8a08-708f-4d3b-8bd8-927ed28c501a",
+      "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "ifA2XxYG0QVzjiXS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<prompt>\n  <examples>\n    <example>\n      <chinese_input>我想点一杯咖啡。</chinese_input>\n      <german_translation>Ich hätte gerne einen Kaffee, bitte.</german_translation>\n      <chinese_explanation>\n- 句子框架：Ich (主语) + hätte gerne (礼貌表达“我想要”) + ...  \n- 动词变位：haben → ich hätte (虚拟式 II 表示礼貌请求)  \n- 名词：Kaffee (咖啡)，阳性，四格 → einen Kaffee\n      </chinese_explanation>\n    </example>\n\n    <example>\n      <chinese_input>我今天必须去超市。</chinese_input>\n      <german_translation>Ich muss heute noch zum Supermarkt gehen.</german_translation>\n      <chinese_explanation>\n- 框架：Ich (主语) + muss (情态动词) + ... gehen (动词不定式后置)  \n- 动词变位：müssen → ich muss  \n- 名词：Supermarkt (超市)，阳性，Dativ → zum Supermarkt\n      </chinese_explanation>\n    </example>\n\n    <example>\n      <chinese_input>这附近有药店吗？</chinese_input>\n      <german_translation>Entschuldigung, gibt es hier in der Nähe eine Apotheke?</german_translation>\n      <chinese_explanation>\n- 框架：Gibt es ...? (存在句问句结构)  \n- 动词变位：geben → es gibt (第三人称单数固定搭配)  \n- 名词：Apotheke (药店)，阴性，主格 → eine Apotheke\n      </chinese_explanation>\n    </example>\n\n    <example>\n      <chinese_input>我累了。</chinese_input>\n      <german_translation>Ich bin müde.</german_translation>\n      <chinese_explanation>\n- 框架：Ich (主语) + bin (动词) + müde (形容词作表语)  \n- 动词变位：sein → ich bin  \n      </chinese_explanation>\n    </example>\n  </examples>\n\n  <role>\n    你是一名德语老师，你帮助有一定德语基础的中国学生把他们说的中文翻译成德语，使他们能够更好地在德国生活。\n  </role>\n\n  <requirements>\n    1. 用德语给出口语化、**礼貌自然**的翻译内容，适合真实生活场景使用。  \n    2. 用中文非常简短地解析德语句子的框架结构、动词变位和单词的变格形式。  \n    3. Fallback 规则：如果句子没有名词，则只写“句子框架”和“动词变位”两部分，不要硬造名词。  \n    4. 输出结果必须严格包含一个 <response> 根标签，且内部必须有两个子块：  \n       - <german_translation> ... </german_translation>  \n       - <chinese_explanation> ... </chinese_explanation> （内容必须是列表格式，每项以 \"-\" 开头，且至少包含上述三部分，或在 fallback 情况下包含两部分）  \n    5. 不要在 <response> 标签之外输出任何内容。  \n  </requirements>\n\n  <student_input>\n    <chinese_waiting_for_translation>\n      {{ $json.text }}\n    </chinese_waiting_for_translation>\n  </student_input>\n\n  <expected_output_format>\n    <response>\n      <german_translation>\n        <!-- 德语口语化且礼貌的翻译 -->\n      </german_translation>\n      <chinese_explanation>\n- <!-- 句子框架结构说明 -->  \n- <!-- 动词变位：原形 → 变位形式（仅主要动词） -->  \n- <!-- 目标词汇：德语词汇 + 中文释义 + 词性 + 变格 -->\n      </chinese_explanation>\n    </response>\n  </expected_output_format>\n</prompt>\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        48
+      ],
+      "id": "03a02d39-b34c-4726-8397-0ac5cec8657b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4.1-nano",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        936,
+        272
+      ],
+      "id": "485f6440-98b0-41d0-90ee-7b275b97efcd",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "HW9tlY0Fp289aGjg",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.message.chat.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        48
+      ],
+      "id": "23fda47e-0fea-44b9-b130-6387bb163fb5",
+      "name": "Send a chat action",
+      "webhookId": "c296a0fe-8cb4-4ef9-a44a-640871a04df2",
+      "credentials": {
+        "telegramApi": {
+          "id": "ifA2XxYG0QVzjiXS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "mergedVideo",
+        "options": {
+          "language": "zh"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        416,
+        -48
+      ],
+      "id": "d0db18c8-cad6-4758-90f7-f2533be2f664",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "DBLTQW3de5U9LrAi",
+          "name": "OpenAi - API2D Admin"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "7faa356c-66da-4735-a94d-0f4fda4b52d5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c009d930-e50f-4636-a275-3d7464cbf9d5",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_text"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -256,
+        48
+      ],
+      "id": "cc417043-49dd-4322-bd78-ed279bf099ad",
+      "name": "Switch",
+      "notesInFlow": true,
+      "notes": "Input check if audio or text"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "tts_data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        176
+      ],
+      "id": "d45aad51-a4d2-4b25-9112-de96659ec85e",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "output": "empty"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2640,
+        272
+      ],
+      "id": "0330a72c-1fbe-49bf-a28f-b1bcb0312deb",
+      "name": "Merge",
+      "notesInFlow": true,
+      "notes": "Wait for both upstreams"
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "action": "record_audio"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1888,
+        -48
+      ],
+      "id": "2f222cd8-6a9a-4bf7-b803-60865c0486b1",
+      "name": "Recording Status",
+      "webhookId": "bf0ee80b-a5c7-4e9e-93db-379e726138f5",
+      "credentials": {
+        "telegramApi": {
+          "id": "ifA2XxYG0QVzjiXS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "replyMarkup": "inlineKeyboard",
+        "additionalFields": {
+          "fileName": "=_date_{{ $('Telegram Trigger').item.json.message.date }}_at_{{ $('Telegram Trigger').item.json.message.message_id }}.mp3"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2336,
+        -144
+      ],
+      "id": "5dfb292d-5116-4613-ab1a-9f67aa0b7a4c",
+      "name": "German Audio Message",
+      "webhookId": "2c9cacf5-9be2-4f4a-aaac-f5a41b5aa935",
+      "credentials": {
+        "telegramApi": {
+          "id": "ifA2XxYG0QVzjiXS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $('Translation').item.json.result.text }}",
+        "voice": "nova",
+        "options": {
+          "response_format": "mp3",
+          "speed": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2112,
+        -48
+      ],
+      "id": "0ed2716e-d7c2-4544-a94e-9709c5c82d8b",
+      "name": "TTS",
+      "credentials": {
+        "openAiApi": {
+          "id": "DBLTQW3de5U9LrAi",
+          "name": "OpenAi - API2D Admin"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $('XML to JSON').item.json.response.chinese_explanation }}",
+        "destinationKey": "html_explaination",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        368
+      ],
+      "id": "9fda32fa-cba1-43af-a306-12a54e2f6543",
+      "name": "MD to HTML"
+    },
+    {
+      "parameters": {
+        "url": "=https://api-anki.harrylearns.com/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"action\": \"addNote\",\n    \"version\": 6,\n    \"params\": {\n        \"note\": {\n            \"deckName\": \"Harry_ZH_2_DE\",\n            \"modelName\": \"Basic\",\n            \"fields\": {\n                \"Front\": {{ JSON.stringify($('Merged Text Input').item.json.text) }},\n                \"Back\": {{ JSON.stringify($('XML to JSON').item.json.response.german_translation + $('MD to HTML').item.json.html_explaination ) }}\n            },\n            \"options\": {\n                \"allowDuplicate\": false,\n                \"duplicateScope\": \"deck\",\n                \"duplicateScopeOptions\": {\n                    \"deckName\": \"Harry_ZH_2_DE\",\n                    \"checkChildren\": false,\n                    \"checkAllModels\": false\n                }\n            },            \n          \"audio\": [{\n                \"data\": \"{{ $('Extract from File').item.json.tts_data }}\",\n                \"filename\": \"_date_{{ $('Telegram Trigger').item.json.message.date }}_at_{{ $('Telegram Trigger').item.json.message.message_id }}.mp3\",\n                \"fields\": [\n                    \"Back\"\n                ]\n            }]\n        }\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2864,
+        272
+      ],
+      "id": "64bd687c-4957-483d-ae87-8b8f777d3def",
+      "name": "Add Anki Card",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "8Lxmuawk8JkqFyzc",
+          "name": "Traefik_User_Basic_Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api-anki.harrylearns.com/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"action\": \"sync\",\n    \"version\": 6\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3088,
+        272
+      ],
+      "id": "e58cc83c-a0da-4e6b-9503-03d9ae5d312a",
+      "name": "Trigger Anki Sync",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "8Lxmuawk8JkqFyzc",
+          "name": "Traefik_User_Basic_Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        -48
+      ],
+      "id": "a487fa31-9f1b-4a50-89c3-5b290171e894",
+      "name": "Save Audio",
+      "webhookId": "3439c417-e2a2-4777-abfb-f327af687cc8",
+      "credentials": {
+        "telegramApi": {
+          "id": "ifA2XxYG0QVzjiXS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8776a878-24bc-45b9-aff9-fe892cdf75b6",
+              "name": "text",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        144
+      ],
+      "id": "e998b595-5068-4ca5-a0fe-f60505623801",
+      "name": "Save Text",
+      "notesInFlow": true,
+      "notes": "Temperary Text Saver"
+    },
+    {
+      "parameters": {
+        "operation": "custom",
+        "outputFileName": "=coverted_{{ $('Telegram Trigger').item.json.message.voice.file_id }}.mp4"
+      },
+      "type": "n8n-nodes-ffmpeg.ffmpeg",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -48
+      ],
+      "id": "0743a868-3f18-40b1-b161-80897c97d4c5",
+      "name": "Convert to MP3",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "notes": "Convert to MP3 format"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ea93a4a5-c196-4131-8400-0ed383268c0b",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        48
+      ],
+      "id": "5ab81470-5770-4b31-95d6-71f2c06739d0",
+      "name": "Merged Text Input",
+      "notesInFlow": true,
+      "notes": "Unify Audio and Text Path"
+    },
+    {
+      "parameters": {
+        "dataPropertyName": "output",
+        "options": {
+          "attrkey": ""
+        }
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        48
+      ],
+      "id": "68b56c27-832e-4d98-a266-207b15ffd238",
+      "name": "XML to JSON"
+    },
+    {
+      "parameters": {
+        "content": "## Part 1: Clean user input and finalize message sent to AI Agent",
+        "height": 416,
+        "width": 1088,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -112
+      ],
+      "id": "9a8d5369-8509-4a2f-bae2-b77cf2287fdf",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": " ## Part 3: Reply messages to user",
+        "height": 480,
+        "width": 1104,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        -272
+      ],
+      "id": "ee6e799b-96f6-421f-9431-ef9266a0d395",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.response.german_translation }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        48
+      ],
+      "id": "3fe8584a-90f4-4278-8ac8-4b26398b8344",
+      "name": "Translation",
+      "webhookId": "e264cc14-e428-4906-b03f-bd2a76de0fe6",
+      "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "ifA2XxYG0QVzjiXS",
+          "name": "Telegram account"
+        }
+      },
+      "notes": "Send German Translation"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('XML to JSON').item.json.response.chinese_explanation }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1664,
+        -48
+      ],
+      "id": "3e5b4803-473d-40a5-97aa-18f04ff03201",
+      "name": "Grammar",
+      "webhookId": "e264cc14-e428-4906-b03f-bd2a76de0fe6",
+      "notesInFlow": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "ifA2XxYG0QVzjiXS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Part 4: Save to Anki",
+        "height": 432,
+        "width": 848
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        96
+      ],
+      "id": "b3ace909-4154-4eaa-b930-a73971dfd0f5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Part 2: enerate Reply",
+        "height": 544,
+        "width": 512,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -128
+      ],
+      "id": "6d20f201-0c84-43e4-8bc4-71aef0dfa1b0",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "XML to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Save Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Merged Text Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Add Anki Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recording Status": {
+      "main": [
+        [
+          {
+            "node": "TTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "German Audio Message": {
+      "main": [
+        []
+      ]
+    },
+    "TTS": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "German Audio Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MD to HTML": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Add Anki Card": {
+      "main": [
+        [
+          {
+            "node": "Trigger Anki Sync",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Audio": {
+      "main": [
+        [
+          {
+            "node": "Convert to MP3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Text": {
+      "main": [
+        [
+          {
+            "node": "Merged Text Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to MP3": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merged Text Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML to JSON": {
+      "main": [
+        [
+          {
+            "node": "Translation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translation": {
+      "main": [
+        [
+          {
+            "node": "MD to HTML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Grammar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grammar": {
+      "main": [
+        [
+          {
+            "node": "Recording Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1ee8a122-fbe4-4016-93d1-6911fe7e8145",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "94079b830d3fc82253c75504b76b69d3daa8bfc1c67ea62a74183b42a28f3b6f"
+  },
+  "id": "sehdgKz69nLm4VZn",
+  "tags": []
+}
