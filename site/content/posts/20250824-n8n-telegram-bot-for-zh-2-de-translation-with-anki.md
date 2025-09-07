@@ -18,8 +18,8 @@ I highly recommend watching this excellent tutorial. In this blog post, I'll foc
 ## Workflow Overview
 The workflow consists of four main components:
 1. **Input Audio and Text Processing**: 
-  1. Capture voice or text messages from Telegram.
-  2. Transcribe audio to text.
+    1. Capture voice or text messages from Telegram.
+    2. Transcribe audio to text.
 2. **Agent Setup**:
    1. Translate text from Chinese to German.
    2. Generate explanations in Chinese.
