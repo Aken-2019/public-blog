@@ -24,7 +24,7 @@ home = [ "HTML", "RSS", "JSON" ]
   weight = -100
 
 [params.homeInfoParams]
-Title = "人生 波澜壮阔"
+Title = "人生波澜壮阔 / Life is vast and magnificent."
 
 [params]   
 gtm = "GTM-WXVJN82"
