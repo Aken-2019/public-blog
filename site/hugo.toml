@@ -1,6 +1,6 @@
 baseURL = '/'
 languageCode = 'en-us'
-title = 'Harry! Learn!'
+title = 'H. NI'
 theme = "hugo-PaperMod"
 
 [outputs]
@@ -24,7 +24,20 @@ home = [ "HTML", "RSS", "JSON" ]
   weight = -100
 
 [params.homeInfoParams]
-Title = "人生波澜壮阔 / Life is vast and magnificent."
+Title = "Haojie Ni's Blog"
+Content = """你好 / Welcome / Willkommen 👋
+
+I put learning materials and my nerdy thoughts here. Wish they are helpful to you. I'm currently looking for a software engineer role in Germany. I excel in Python and Linux.
+
+"""
+
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/Aken-2019"
+
+[[params.socialIcons]]
+  name = "linkedin"
+  url = "https://www.linkedin.com/in/haojie-ni/"
 
 [params]   
 gtm = "GTM-WXVJN82"
