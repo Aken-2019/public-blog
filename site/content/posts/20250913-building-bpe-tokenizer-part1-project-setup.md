@@ -151,7 +151,7 @@ In [Part 2]({{< ref "20250913-building-bpe-tokenizer-part2-train-method.md" >}})
 ## Resources
 
 - [BPE Tokenizer from Scratch by Sebastian Raschka](https://sebastianraschka.com/blog/2025/bpe-from-scratch.html) - The reference implementation this tutorial is based on
-- [Let's build the GPT Tokenizer](https://www.youtube.com/watch?v=zduSFxRajkE)
+- [Let's build the GPT Tokenizer](https://www.youtube.com/watch?v=zduSFxRajkE) - A great video walkthrough of building a BPE tokenizer
 
 
 Happy coding!
