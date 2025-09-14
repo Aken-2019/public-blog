@@ -7,7 +7,24 @@ showtoc = true
 summary = "First part of a series on building a Byte Pair Encoding tokenizer using Test-Driven Development. We set up our project structure, create a virtual environment, and write our first test for the tokenizer's initialization."
 +++
 
+
+## Introduction
+
+This tutorial is part of a comprehensive project that guides you through building a Byte Pair Encoding (BPE) tokenizer from scratch using Test-Driven Development (TDD). The project is inspired by [Sebastian Raschka's blog post](https://sebastianraschka.com/blog/2025/bpe-from-scratch.html) on BPE tokenizer implementation but has been redesigned with an educational focus and TDD approach.
+
+Our implementation differs from the original in several ways:
+- It's a character-level (rather than byte-level) BPE tokenizer for simplicity
+- The code is organized into progressive tutorial sections
+- Each section includes comprehensive documentation, tests, and implementation templates
+- We emphasize test-driven development practices throughout
+
+This tutorial series will help you understand both the theoretical concepts of BPE tokenization and practical implementation details while following software engineering best practices.
+
+
+## Getting Started
+
 Welcome to the first part of our series on building a Byte Pair Encoding (BPE) tokenizer using Test-Driven Development (TDD). In this tutorial, we'll set up our project structure, create a virtual environment, and write our first test for the tokenizer's initialization.
+
 
 > **Source Code**: The complete source code for this tutorial series is available on my GitHub repo at [daily-dev-notes/2025/bpe-tokenizer-tdd](https://github.com/Aken-2019/daily-dev-notes/tree/main/2025/bpe-tokenizer-tdd). Feel free to clone the repository and follow along with the implementation.
 
