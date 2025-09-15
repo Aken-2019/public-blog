@@ -27,7 +27,13 @@ home = [ "HTML", "RSS", "JSON" ]
 Title = "Haojie Ni's Blog"
 Content = """你好 / Welcome / Willkommen 👋
 
-I put learning materials and my nerdy thoughts here. Wish they are helpful to you. I'm currently looking for a software engineer role in Germany. I excel in Python and Linux.
+This is my little corner on the internet where I share learning notes and some nerdy thoughts—hopefully you’ll find something useful (or at least fun) here.  
+
+Right now, I’m exploring opportunities as a software engineer in Germany, especially around Python Backend, DevOps, and Data Engineering. I spend most of my time in Python and Linux, and I enjoy tinkering with them a lot.  
+
+Feel free to check out my [LinkedIn](https://www.linkedin.com/in/haojie-ni/) or [GitHub](https://github.com/Aken-2019) if you’re curious about what I’ve been working on.  
+And if you’d like the full story, my CV is available as a [PDF](/cv/H_NI-Python-Backend.pdf).
+
 
 """
 
