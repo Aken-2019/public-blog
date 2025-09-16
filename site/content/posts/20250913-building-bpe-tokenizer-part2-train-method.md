@@ -9,7 +9,7 @@ summary = "Second part of our BPE tokenizer series, focusing on implementing the
 
 Welcome to Part 2 of our series on building a Byte Pair Encoding (BPE) tokenizer using Test-Driven Development (TDD). In [Part 1]({{< ref "20250913-building-bpe-tokenizer-part1-project-setup.md" >}}), we set up our project and the basic `BPETokenizer` class. In this tutorial, we'll implement the `train` method, which is the core of the BPE algorithm.
 
-> **Source Code**: The complete source code for this tutorial series is available on my GitHub repo at [daily-dev-notes/2025/bpe-tokenizer-tdd](https://github.com/Aken-2019/daily-dev-notes/tree/main/2025/bpe-tokenizer-tdd). Feel free to clone the repository and follow along with the implementation.
+> **Source Code**: The complete source code for this tutorial series is available on my GitHub repo at [Aken-2019/bpe-tokenizer-tdd](https://github.com/Aken-2019/bpe-tokenizer-tdd). Feel free to clone the repository and follow along with the implementation.
 
 
 > **Note to Readers**: The complete solution to all tests can be found in `src/solution_BPETokenizer.py`. We encourage you to try implementing the solutions yourself first, then compare with the reference implementation.
